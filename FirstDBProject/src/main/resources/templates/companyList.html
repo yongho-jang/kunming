@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head th:replace="fragments/header :: head"/>
+       
+    <body class="sb-nav-fixed">
+        <nav  th:replace="fragments/header :: title"/>
+            
+        <div id="layoutSidenav">
+            <div th:replace="fragments/header :: leftMenu"/>
+
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">상장사 목록</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item active">전체 상장사 목록입니다.</li>
+                        </ol>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Company List
+                            </div>
+                            <div class="card-body">
+                                <table id="datatablesSimple">
+                                    <thead>
+                                        <tr>
+                                            <th>표준코드</th>
+                                            <th>단축코드</th>
+                                            <th>종목명</th>
+                                            <th>상장일</th>
+                                            <th>시장구분</th>
+                                            <th>증권구분</th>
+                                            <th>주식종류</th>
+                                            <th>액면가</th>
+                                            <th>상장주식수</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>표준코드</th>
+                                            <th>단축코드</th>
+                                            <th>종목명</th>
+                                            <th>상장일</th>
+                                            <th>시장구분</th>
+                                            <th>증권구분</th>
+                                            <th>주식종류</th>
+                                            <th>액면가</th>
+                                            <th>상장주식수</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        <tr th:each="company: ${companyList}">
+                                            <td th:text="${company.isin}"/>
+                                            <td th:text="${company.issueCode}"/>
+                                            <td th:text="${company.issueName}"/>
+                                            <td th:text="${company.listingDate}"/>
+                                            <td th:text="${company.marketType}"/>
+                                            <td th:text="${company.securitiesType}"/>
+                                            <td th:text="${company.shareType}"/>
+                                            <td th:text="${company.parValue}"/>
+                                            <td th:text="${company.noOfListedShares}"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </main>
+                <footer th:replace="fragments/footer :: footer"/>
+            </div>
+        </div>
+
+    </body>
+</html>

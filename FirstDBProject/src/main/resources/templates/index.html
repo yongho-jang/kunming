@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head th:replace="fragments/header :: head"/>      
+    <body class="sb-nav-fixed">
+        <nav  th:replace="fragments/header :: title"/>
+            
+        <div id="layoutSidenav">
+            <div th:replace="fragments/header :: leftMenu"/>
+
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container px-4 py-5" id="featured-3">
+				    <h2 class="pb-2 border-bottom">Project KUN MING</h2>
+				    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+				      <div class="feature col">
+				        <button onclick="document.location='/chagvv/analyze'" type="button" class="btn feature-icon d-inline-flex align-items-center justify-content-center text-bg-secondary bg-gradient fs-2 mb-3">
+			                <svg class="bi" width="1em" height="1em"><use xlink:href="#bi-speedometer2"/></svg>
+				        </button>
+				        <h3 class="fs-2">차트 분석</h3>
+				        <p>박진홍 프로의 주식 차트 분석입니다. naver 의 시세 데이터를 이용하여 계산 됩니다.</p>
+				      </div>
+				      <div class="feature col">
+				        <button onclick="document.location='/chagvv/companyList'"  type="button" class="btn feature-icon d-inline-flex align-items-center justify-content-center text-bg-secondary bg-gradient fs-2 mb-3">
+			                <svg class="bi" width="1em" height="1em"><use xlink:href="#bi-list-ul"/></svg>
+				        </button>
+				        <h3 class="fs-2">상장사 목록</h3>
+				        <p>KRX 정보데이터시스템의 "기본통계 > 주식 > 전 종목 기본정보" 에서 제공하는 목록을 보여줍니다. 2023년 4월 16일 기준.  (http://data.krx.co.kr/contents/MDC/MDI/mdiLoader/index.cmd?menuId=MDC0201040201)</p>
+				      </div>
+				    </div>
+				  </div>
+                </main>
+                <footer th:replace="fragments/footer :: footer"/>
+            </div>
+        </div>
+    </body>
+</html>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="gear-fill" viewBox="0 0 16 16">
+    <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+  </symbol>
+  <symbol id="collection" viewBox="0 0 16 16">
+    <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
+  </symbol>
+  <symbol id="bi-speedometer2" viewBox="0 0 16 16">
+    <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+    <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/>
+  </symbol>
+  <symbol id="bi-list-ul" viewBox="0 0 16 16">
+  	<path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+	</symbol>
+</svg>  

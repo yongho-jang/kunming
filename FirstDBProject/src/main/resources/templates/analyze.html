@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+    <head th:replace="fragments/header :: head"/>
+    <script>
+		
+		var rankingMax = 20;
+		var companyList = [(${companyList})];
+		
+		var stopText = "차트 분석 중지 !!";
+		var startText = "차트 분석 시작 !!";
+		function startAnalyze(){
+			let button = document.getElementById("startButton");
+			
+			if(button.innerText == stopText){
+				isRun = false;
+				button.innerText = startText;
+				
+				let runState = document.getElementById("runState");
+				runState.innerText = '';
+			}else{
+				button.innerText = stopText;
+				isRun = true;
+				runAnalyze();				
+			}
+		}
+		
+		var isRun = false;
+		
+		function runAnalyze(){
+			
+			
+			let resultE = document.getElementById("resultELower");
+			let list = resultE.getElementsByTagName("a");
+			for(j=0; j<list.length; j++){
+				resultE.removeChild(list[j]);
+			}
+			resultE = document.getElementById("resultEUpper");
+			list = resultE.getElementsByTagName("a");
+			for(j=0; j<list.length; j++){
+				resultE.removeChild(list[j]);
+			}
+			
+			
+			let marketType;
+			let marketTypes = document.getElementsByName("marketType");
+			for(let i=0; i<marketTypes.length; i++){
+				if(marketTypes[i].checked){
+					marketType = marketTypes[i].id;
+					break;
+				}
+			}
+
+			let synchSize = 100;
+			
+			let targetList = companyList;
+			if(marketType != 'ALL'){
+				targetList = [];
+				companyList.forEach(company =>{
+					if(company.marketType == marketType){
+						targetList.push(company);
+					}
+				});
+			}
+			
+			runAnalyzeList(targetList, 0);
+
+		}
+		
+		function runAnalyzeList(list, i){
+			
+			let EnvelopeDuration = document.getElementById("EnvelopeDuration").value;
+			let EnvelopeRate = document.getElementById("EnvelopeRate").value;
+			let button = document.getElementById("startButton");
+			let runState = document.getElementById("runState");
+			let company = list[i];
+			let issueCode = company.issueCode;
+			runState.innerText = company.issueName + ' 분석중...';
+			//console.log(company.issueName + ' 분석중...');
+			
+			const xhr = new XMLHttpRequest();
+			
+			xhr.open('GET', '/chagvv/analyzeCompany?issueCode=' + issueCode + "&EnvelopeDuration="+EnvelopeDuration+ "&EnvelopeRate=" + EnvelopeRate);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.onload = function (e) {
+				if (xhr.readyState === 4) {
+					if (xhr.status === 200) {
+						let result = JSON.parse(xhr.response);
+						
+						scanComplete(result,company);
+						
+						if(list.length-1 > i && isRun){
+							runAnalyzeList(list, i+1);
+						}else{
+							isRun = false;
+							button.innerText = startText;
+							runState.innerText = '';
+						}
+					} else {
+						console.error(xhr.statusText);
+						isRun = false;
+						button.innerText = startText;
+						runState.innerText = '';
+					}
+				}
+			};
+			
+			xhr.onerror = function (e) {
+				console.error(xhr.statusText);
+				isRun = false;
+				button.innerText = startText;
+				runState.innerText = '';
+			};
+
+			/* 정의된 서버에 요청을 전송 */
+			xhr.send();
+		}
+		/*
+		{
+			"date":"20230406",
+			"openPrice":3565,
+			"highPrice":3565,
+			"lowPrice":2800,
+			"closePrice":3090,
+			"transactionVolume":13,
+			"foreignerExhaustionRate":0.0,
+			"centerLine":3139,
+			"upperLine":3767,
+			"lowerLine":2511,
+			"obv":93,"ndi":0,
+			"mdm":0.0,
+			"tr":765.0
+		}
+		*/
+		function scanComplete(data,company){
+			let cdata = data[data.length-1];
+			
+			cdata.lowerScore = (cdata.closePrice - cdata.lowerLine)*100/(cdata.centerLine-cdata.lowerLine);
+			cdata.upperScore = (cdata.upperLine - cdata.closePrice )*100/(cdata.upperLine-cdata.centerLine);
+
+			if(!cdata.lowerScore)cdata.lowerScore = 0;
+			if(!cdata.upperScore)cdata.upperScore = 0;
+			
+			insertRanking("resultELower", cdata, company, cdata.lowerScore, false);
+			insertRanking("resultEUpper", cdata, company, cdata.upperScore, true);
+		}
+		
+		function insertRanking(elementId, cdata, company, tscore, up){
+			
+			let resultE = document.getElementById(elementId);
+			let ranking = resultE.getElementsByTagName("a");
+			
+			let insert = false;
+			if(ranking){
+				for(var i=0; i< ranking.length ; i++){
+					
+					let score = ranking[i].firstChild.value;
+					
+					if(score > tscore){
+						insertScore(resultE, ranking, i , cdata, company, tscore);
+						insert = true;
+						break;
+					
+					}
+				}
+			}
+			if(!insert){
+				insertScore(resultE, ranking, ranking.length , cdata, company, tscore);
+			}
+		}
+		/*
+			private String isin;
+	@Id private String issueCode;
+	private String issueName;
+	private String ListingDate;
+	private String marketType;
+	private String securitiesType;
+	private String companyCategory;
+	private String shareType;
+	private int parValue;
+	private long noOfListedShares;
+		*/
+		function insertScore(resultE, list, i, cdata, company, tscore){
+			
+			let newRanking = document.getElementById("IssueTemplate").cloneNode(true);
+			newRanking.id = company.issueCode;
+			newRanking.firstChild.value = tscore;
+			newRanking.href = "https://finance.naver.com/item/fchart.nhn?code="+company.issueCode;
+			newRanking.target = "_Blank";
+			
+			let issueName = newRanking.getElementsByTagName("h6");
+			let desc = newRanking.getElementsByTagName("p");
+		  	let score = newRanking.getElementsByTagName("small");
+		  	
+		  	issueName[0].innerText = company.issueName;
+		  	desc[0].innerText ='점수:' + tscore.toFixed(2) + ', E상한선:' +cdata.upperLine + ',E중심선:' +cdata.centerLine+ ',E하한선:' +cdata.lowerLine+ ', 종가:' +cdata.closePrice ;
+		  	score[0].innerText = i + 1;
+		  
+		  	resultE.insertBefore(newRanking, list[i]);
+		  	
+		  	for( i++ ; i< list.length; i++ ){
+				let nscore = list[i].getElementsByTagName("small");
+				nscore[0].innerText = i;
+			}
+			
+			for(j=rankingMax+1; j<list.length; j++){
+				resultE.removeChild(list[j]);
+			}
+		}
+		
+	</script>
+    <body class="sb-nav-fixed">
+        <nav  th:replace="fragments/header :: title"/>
+            
+        <div id="layoutSidenav">
+            <div th:replace="fragments/header :: leftMenu"/>
+
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">차트분석</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item active">입력한 조건으로 차트를 분석 합니다.</li>
+                        </ol>
+                        <div class="row inputPanel">
+                            <form class="needs-validation" novalidate>
+					          <div class="row g-3" >
+					            <div class="col-sm-6" style="max-width: 160px;">
+					              <label for="EnvelopeDuration" class="form-label">Envelope 기간(일)</label>
+					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="EnvelopeDuration" placeholder="" value="20" required>
+					              <div class="invalid-feedback">
+					                Valid Envelope 기간 is required.
+					              </div>
+					            </div>
+					
+					            <div class="col-sm-6" style="max-width: 160px;">
+					              <label for="EnvelopeRate" class="form-label">Envelope 가감값(%)</label>
+					              <input style="text-align: right;" type="number" min="1" max="100"  class="form-control" id="EnvelopeRate" placeholder="" value="20" required>
+					              <div class="invalid-feedback">
+					                Valid last Envelope 가감값 is required.
+					              </div>
+					            </div>
+					
+					            <div class="col-12">
+					              <div class="form-check">
+									  <input id="ALL" name="marketType" type="radio" class="form-check-input" checked required>
+						              <label class="form-check-label" for="ALL">전체</label>
+						              </div><div class="form-check">
+						              <input id="KOSPI" name="marketType" type="radio" class="form-check-input" required>
+						              <label class="form-check-label" for="KOSPI">코스피</label>
+										</div><div class="form-check">
+						              <input id="KOSDAQ" name="marketType" type="radio" class="form-check-input" required>
+						              <label class="form-check-label" for="KOSDAQ">코스닥</label>
+						              </div><div class="form-check">
+						              <input id="KONEX" name="marketType" type="radio" class="form-check-input" required>
+						              <label class="form-check-label" for="KONEX">코넥스</label>
+					            </div>
+
+					          <button id="startButton" class="w-100 btn btn-primary btn-lg" type="button" onclick="startAnalyze()">차트 분석 시작 !!</button>
+					        </form>
+                        </div>
+                        <div class="row">
+                        	<label id="runState" class="form-label"></label>
+                        </div>
+                        <hr class="my-4">
+						<div class="row">
+							<label for="EnvelopeDuration" class="form-label">Envelope 하한선 접근</label>
+							<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+							  <div id="resultELower" class="list-group"/>
+							</div>
+						</div>
+						<hr class="my-4">
+						<div class="row">
+							<label for="EnvelopeDuration" class="form-label">Envelope 상한선 접근</label>
+							<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
+							  <div id="resultEUpper" class="list-group"/>
+							</div>
+						</div>
+                    </div>
+                </main>
+                <footer th:replace="fragments/footer :: footer"/>
+            </div>
+        </div>
+    </body>
+</html>
+
+<div style="display:none">
+	<a id="IssueTemplate" href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+		<input type="hidden" name="score" >
+		<div class="d-flex gap-2 w-100 justify-content-between">
+			<div>
+				<h6 id="issueName" class="mb-0">종목 </h6>
+				<p id="desc" class="mb-0 opacity-75">지표</p>
+			</div>
+			<small id="score" class="opacity-50 text-nowrap">순위</small>
+		</div>
+	</a>
+</div>
+
