@@ -31,4 +31,4 @@ spring:
 server:
   servlet:
     context-path: /chagvv 
-  port: 80
+  port: 808
