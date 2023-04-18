@@ -21,8 +21,7 @@ public class CompanyService {
 		
 		allCompanyList.clear();
 		
-		String dataLocation = "src\\main\\resources\\static\\data\\";
-		File file = new File(dataLocation + "data_5155_20230418.csv");
+		File file = new File("list.csv");
 		
 		BufferedReader reader = null;
 		try {
