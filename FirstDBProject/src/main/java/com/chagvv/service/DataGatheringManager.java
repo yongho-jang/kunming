@@ -80,7 +80,10 @@ public class DataGatheringManager {
 		}
 		
 		searchEnv(list, envelopeDuration, envelopeRate);
+		
 		searchNdi(list);
+		
+		
 		
 		return list;
 	}
@@ -115,7 +118,7 @@ public class DataGatheringManager {
 	}
 	
 	/**
-	 * OBV, MDM, TR, NDI 계
+	 * OBV, MDM, TR 계산 
 	 * @param list
 	 */
 	private void searchNdi(List<StockData> list) {
@@ -137,7 +140,7 @@ public class DataGatheringManager {
 				}else if(f > e) {	
 					data.setObv(preData.getObv() + data.getTransactionVolume());
 				}else {
-					data.setObv(preData.getObv() + data.getTransactionVolume());
+					data.setObv(preData.getObv() - data.getTransactionVolume());
 				}
 					
 				//MDM
@@ -148,6 +151,8 @@ public class DataGatheringManager {
 				//TR
 				data.setTr(Math.max(a-b, Math.max(Math.abs(e-a), Math.abs(e-b))));
 					
+			}else {
+				data.setObv(data.getTransactionVolume());
 			}
 			preData = data;
 		}

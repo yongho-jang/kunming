@@ -114,23 +114,7 @@
 			/* 정의된 서버에 요청을 전송 */
 			xhr.send();
 		}
-		/*
-		{
-			"date":"20230406",
-			"openPrice":3565,
-			"highPrice":3565,
-			"lowPrice":2800,
-			"closePrice":3090,
-			"transactionVolume":13,
-			"foreignerExhaustionRate":0.0,
-			"centerLine":3139,
-			"upperLine":3767,
-			"lowerLine":2511,
-			"obv":93,"ndi":0,
-			"mdm":0.0,
-			"tr":765.0
-		}
-		*/
+
 		function scanComplete(data,company){
 			let cdata = data[data.length-1];
 			
@@ -179,6 +163,25 @@
 	private int parValue;
 	private long noOfListedShares;
 		*/
+		
+				/*
+		{
+			"date":"20230406",
+			"openPrice":3565,
+			"highPrice":3565,
+			"lowPrice":2800,
+			"closePrice":3090,
+			"transactionVolume":13,
+			"foreignerExhaustionRate":0.0,
+			"centerLine":3139,
+			"upperLine":3767,
+			"lowerLine":2511,
+			"obv":93,"ndi":0,
+			"mdm":0.0,
+			"tr":765.0
+		}
+		*/
+		
 		function insertScore(resultE, list, i, cdata, company, tscore){
 			
 			let newRanking = document.getElementById("IssueTemplate").cloneNode(true);
@@ -192,7 +195,9 @@
 		  	let score = newRanking.getElementsByTagName("small");
 		  	
 		  	issueName[0].innerText = company.issueName;
-		  	desc[0].innerText ='점수:' + tscore.toFixed(2) + ', E상한선:' +cdata.upperLine + ',E중심선:' +cdata.centerLine+ ',E하한선:' +cdata.lowerLine+ ', 종가:' +cdata.closePrice ;
+		  	desc[0].innerText ='점수:' + tscore.toFixed(2) + ', E상한선:' +cdata.upperLine 
+		  		+ ',E중심선:' +cdata.centerLine+ ',E하한선:' +cdata.lowerLine+ ', 종가:' +cdata.closePrice
+		  		+ ',OBV:' +cdata.obv+ ',MDM:' +cdata.mdm+ ', TR:' +cdata.tr ; 
 		  	score[0].innerText = i + 1;
 		  
 		  	resultE.insertBefore(newRanking, list[i]);
@@ -238,7 +243,7 @@
 					              <div class="invalid-feedback">
 					                Valid last Envelope 가감값 is required.
 					              </div>
-					            </div>
+					            </div> 
 					
 					            <div class="col-12">
 					              <div class="form-check">
