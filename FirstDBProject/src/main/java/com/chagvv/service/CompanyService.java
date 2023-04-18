@@ -5,25 +5,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.chagvv.entity.Company;
-import com.chagvv.repository.CompanyRepository;
+import com.chagvv.beans.Company;
 
 @Component
 public class CompanyService {
 	
-	private final CompanyRepository repository;
-	
-	public CompanyService(CompanyRepository repository) {
-		this.repository = repository;
-	}
+	private List<Company> allCompanyList = new ArrayList<>(); 
 	
 	public void reloadAllCompanies() throws IOException{
-		repository.deleteAll();
 		
-		File file = new File("/Users/yongho/Documents/data_1722_20230415.csv");
+		allCompanyList.clear();
+		
+		File file = new File("list.csv");
+		
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"euc-kr"));
@@ -38,7 +37,6 @@ public class CompanyService {
 
 					line = line.substring(1,line.length()-1);
 					line= line.replaceAll(",,",",\"\",");
-					System.out.println(line);
 					String[] data = line.split("\",\"");
 					
 					Company company = new Company();
@@ -55,8 +53,8 @@ public class CompanyService {
 					}catch(NumberFormatException ex) {}
 					company.setNoOfListedShares(Long.parseLong(data[11]));
 					
-					repository.save(company);
-					
+					allCompanyList.add(company);
+
 					line = reader.readLine();
 				}
 			}
@@ -64,4 +62,14 @@ public class CompanyService {
 			if(reader!=null)reader.close();
 		}
 	}
+
+	public List<Company> getAllCompanyList() {
+		return allCompanyList;
+	}
+
+	public void setAllCompanyList(List<Company> allCompanyList) {
+		this.allCompanyList = allCompanyList;
+	}
+	
+	
 }

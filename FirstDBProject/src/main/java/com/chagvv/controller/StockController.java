@@ -10,21 +10,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.chagvv.beans.StockData;
-import com.chagvv.entity.Company;
-import com.chagvv.repository.CompanyRepository;
+import com.chagvv.beans.Company;
 import com.chagvv.service.CompanyService;
 import com.chagvv.service.DataGatheringManager;
+
+import jakarta.annotation.PostConstruct;
 
 @Controller
 public class StockController {
 	
-	CompanyRepository companyRepository;
 	CompanyService companyService;
 	
-	public StockController(CompanyRepository repository,CompanyService service) {
-		this.companyRepository = repository;
+	public StockController(CompanyService service) {
+
 		this.companyService = service;
-		
 		try {
 			companyService.reloadAllCompanies();
 		} catch (IOException e) {
@@ -39,7 +38,7 @@ public class StockController {
 	
 	@GetMapping("/analyze")
 	public String analyze(ModelMap map) { 
-		List<Company> list = companyRepository.findAll();
+		List<Company> list = companyService.getAllCompanyList();
 		
 		map.addAttribute("companyList", list);
 		return "analyze";
@@ -48,7 +47,7 @@ public class StockController {
 	@GetMapping("/companyList")
 	public String companyList(ModelMap map) {
 		
-		List<Company> list = companyRepository.findAll();
+		List<Company> list = companyService.getAllCompanyList();
 		
 		map.addAttribute("companyList", list);
 		return "companyList";

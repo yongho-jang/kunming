@@ -1,16 +1,14 @@
-package com.chagvv.entity;
+package com.chagvv.beans;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Company {
 	
 	private String isin;
-	@Id private String issueCode;
+	private String issueCode;
 	private String issueName;
 	private String ListingDate;
 	private String marketType;
