@@ -8,6 +8,7 @@ public class FirstDbProjectApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(FirstDbProjectApplication.class, args);
+
 	}
 
 }

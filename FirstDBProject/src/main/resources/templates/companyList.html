@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
-    <head th:replace="fragments/header :: head"/>
+    <head th:replace="~{fragments/header :: head}"/>
        
     <body class="sb-nav-fixed">
-        <nav  th:replace="fragments/header :: title"/>
+        <nav  th:replace="~{fragments/header :: title}"/>
             
         <div id="layoutSidenav">
-            <div th:replace="fragments/header :: leftMenu"/>
+            <div th:replace="~{fragments/header :: leftMenu}"/>
 
             <div id="layoutSidenav_content">
                 <main>
@@ -67,7 +67,7 @@
                         
                     </div>
                 </main>
-                <footer th:replace="fragments/footer :: footer"/>
+                <footer th:replace="~{fragments/footer :: footer}"/>
             </div>
         </div>
 

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-    <head th:replace="fragments/header :: head"/>      
+    <head th:replace="~{fragments/header :: head}"/>      
     <body class="sb-nav-fixed">
-        <nav  th:replace="fragments/header :: title"/>
+        <nav  th:replace="~{fragments/header :: title}"/>
             
         <div id="layoutSidenav">
-            <div th:replace="fragments/header :: leftMenu"/>
+            <div th:replace="~{fragments/header :: leftMenu}"/>
 
             <div id="layoutSidenav_content">
                 <main>
@@ -17,19 +17,19 @@
 			                <svg class="bi" width="1em" height="1em"><use xlink:href="#bi-speedometer2"/></svg>
 				        </button>
 				        <h3 class="fs-2">차트 분석</h3>
-				        <p>박진홍 프로의 주식 차트 분석입니다. naver 의 시세 데이터를 이용하여 계산 됩니다.</p>
+				        <p>박프로의 주식 차트 분석입니다. naver 의 시세 데이터를 이용하여 계산 됩니다.</p>
 				      </div>
 				      <div class="feature col">
 				        <button onclick="document.location='/chagvv/companyList'"  type="button" class="btn feature-icon d-inline-flex align-items-center justify-content-center text-bg-secondary bg-gradient fs-2 mb-3">
 			                <svg class="bi" width="1em" height="1em"><use xlink:href="#bi-list-ul"/></svg>
 				        </button>
 				        <h3 class="fs-2">상장사 목록</h3>
-				        <p>KRX 정보데이터시스템의 "기본통계 > 주식 > 전 종목 기본정보" 에서 제공하는 목록을 보여줍니다. 2023년 4월 16일 기준.  (http://data.krx.co.kr/contents/MDC/MDI/mdiLoader/index.cmd?menuId=MDC0201040201)</p>
+				        <p>KRX 정보데이터시스템의 "기본통계 > 주식 > 전 종목 기본정보" 에서 제공하는 목록을 보여줍니다. 2023년 4월 18일 기준.  (http://data.krx.co.kr/contents/MDC/MDI/mdiLoader/index.cmd?menuId=MDC0201040201)</p>
 				      </div>
 				    </div>
 				  </div>
                 </main>
-                <footer th:replace="fragments/footer :: footer"/>
+                <footer th:replace="~{fragments/footer :: footer}"/>
             </div>
         </div>
     </body>
