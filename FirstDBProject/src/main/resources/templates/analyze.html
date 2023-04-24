@@ -2,8 +2,73 @@
 <html>
     <head th:replace="~{fragments/header :: head}"/>
     <script>
+
+		$(document).ready(function () {
+			
+			var config =
+			{
+			    order: [ [ 7, "asc" ] ],
+			    columnDefs:
+				[
+				    {
+				        targets: 3,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 4,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 5,
+				        render: $.fn.dataTable.render.number(',')
+				    },{
+				        targets: 6,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 8,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 9,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 10,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 11,
+				        render: $.fn.dataTable.render.number(',')
+				    },
+				    {
+				        targets: 12,
+				        render: $.fn.dataTable.render.number(',')
+				    }
+				]
+			};
+
+		    var resultLowerTable = $('#resultUpperTable').DataTable(config);
+		    var resultUpperTable = $('#resultLowerTable').DataTable(config);
+		});
+/*
+		window.addEventListener('DOMContentLoaded', event => {
+		    let resultUpperTable = document.getElementById('resultUpperTable');
+		    
+		    if (resultUpperTable) {
+		        new simpleDatatables.DataTable(resultUpperTable);
+		        resultUpperTable.id = 'resultUpperTable';
+		    }
+		    
+		    let  resultLowerTable = document.getElementById('resultLowerTable');
+		    if (resultLowerTable) {
+		        new simpleDatatables.DataTable(resultLowerTable);
+		        resultLowerTable.id = 'resultLowerTable';
+		    }
+		});
+*/
 		
-		var rankingMax = 20;
+		var rankingMax = 10;
 		var companyList = [(${companyList})];
 		
 		var stopText = "차트 분석 중지 !!";
@@ -27,19 +92,12 @@
 		var isRun = false;
 		
 		function runAnalyze(){
+
+			$('#resultLowerTable').DataTable().clear().draw();
+			$('#resultUpperTable').DataTable().clear().draw();
 			
-			
-			let resultE = document.getElementById("resultELower");
-			let list = resultE.getElementsByTagName("a");
-			for(j=0; j<list.length; j++){
-				resultE.removeChild(list[j]);
-			}
-			resultE = document.getElementById("resultEUpper");
-			list = resultE.getElementsByTagName("a");
-			for(j=0; j<list.length; j++){
-				resultE.removeChild(list[j]);
-			}
-			
+			let resultCount = document.getElementById("resultCount");
+			rankingMax = resultCount.value;
 			
 			let marketType;
 			let marketTypes = document.getElementsByName("marketType");
@@ -62,6 +120,7 @@
 				});
 			}
 			
+		
 			runAnalyzeList(targetList, 0);
 
 		}
@@ -72,14 +131,19 @@
 			let EnvelopeRate = document.getElementById("EnvelopeRate").value;
 			let button = document.getElementById("startButton");
 			let runState = document.getElementById("runState");
+			
+			let ObvLongTerm = document.getElementById("ObvLongTerm").value;
+			let ObvShortTerm = document.getElementById("ObvShortTerm").value;
+
 			let company = list[i];
 			let issueCode = company.issueCode;
-			runState.innerText = company.issueName + ' 분석중...';
-			//console.log(company.issueName + ' 분석중...');
+			runState.innerText = company.issueName + ' 분석중... ('+i + '/'+ list.length +')';
 			
 			const xhr = new XMLHttpRequest();
 			
-			xhr.open('GET', '/chagvv/analyzeCompany?issueCode=' + issueCode + "&EnvelopeDuration="+EnvelopeDuration+ "&EnvelopeRate=" + EnvelopeRate);
+			xhr.open('GET', '/chagvv/analyzeCompany?issueCode=' + issueCode + "&EnvelopeDuration="
+				+EnvelopeDuration+ "&EnvelopeRate=" + EnvelopeRate+ "&ObvLongTerm=" + ObvLongTerm+ "&ObvShortTerm=" + ObvShortTerm);
+				
 			xhr.setRequestHeader("Content-Type", "application/json");
 			xhr.onload = function (e) {
 				if (xhr.readyState === 4) {
@@ -118,97 +182,78 @@
 		function scanComplete(data,company){
 			let cdata = data[data.length-1];
 			
-			cdata.lowerScore = (cdata.closePrice - cdata.lowerLine)*100/(cdata.centerLine-cdata.lowerLine);
-			cdata.upperScore = (cdata.upperLine - cdata.closePrice )*100/(cdata.upperLine-cdata.centerLine);
+			let minEndCost = document.getElementById("minEndCost").value;
+			if(cdata.closePrice < minEndCost){
+				return;
+			}
+			
+			cdata.lowerScore = Math.round((cdata.closePrice - cdata.lowerLine)*100/(cdata.centerLine-cdata.lowerLine));
+			cdata.upperScore = Math.round((cdata.upperLine - cdata.closePrice )*100/(cdata.upperLine-cdata.centerLine));
 
 			if(!cdata.lowerScore)cdata.lowerScore = 0;
 			if(!cdata.upperScore)cdata.upperScore = 0;
 			
-			insertRanking("resultELower", cdata, company, cdata.lowerScore, false);
-			insertRanking("resultEUpper", cdata, company, cdata.upperScore, true);
+			insertTR("resultLowerTable", cdata, company, cdata.lowerScore, true);
+			insertTR("resultUpperTable", cdata, company, cdata.upperScore, true);
 		}
 		
-		function insertRanking(elementId, cdata, company, tscore, up){
+		function insertTR(elementId, cdata, company, tscore, up){
 			
-			let resultE = document.getElementById(elementId);
-			let ranking = resultE.getElementsByTagName("a");
-			
+			var resultE = $('#'+elementId).DataTable();
+			let ranking = resultE.rows().data();
 			let insert = false;
+			
 			if(ranking){
 				for(var i=0; i< ranking.length ; i++){
-					
-					let score = ranking[i].firstChild.value;
+
+					let score = ranking[i][7]; //score
 					
 					if(score > tscore){
-						insertScore(resultE, ranking, i , cdata, company, tscore);
+						insertTD(resultE, ranking, i , cdata, company, tscore);
 						insert = true;
 						break;
-					
 					}
 				}
 			}
 			if(!insert){
-				insertScore(resultE, ranking, ranking.length , cdata, company, tscore);
+				insertTD(resultE, ranking, ranking.length , cdata, company, tscore);
 			}
 		}
-		/*
-			private String isin;
-	@Id private String issueCode;
-	private String issueName;
-	private String ListingDate;
-	private String marketType;
-	private String securitiesType;
-	private String companyCategory;
-	private String shareType;
-	private int parValue;
-	private long noOfListedShares;
-		*/
 		
-				/*
-		{
-			"date":"20230406",
-			"openPrice":3565,
-			"highPrice":3565,
-			"lowPrice":2800,
-			"closePrice":3090,
-			"transactionVolume":13,
-			"foreignerExhaustionRate":0.0,
-			"centerLine":3139,
-			"upperLine":3767,
-			"lowerLine":2511,
-			"obv":93,"ndi":0,
-			"mdm":0.0,
-			"tr":765.0
-		}
-		*/
 		
-		function insertScore(resultE, list, i, cdata, company, tscore){
+		function insertTD(resultE, list, i, cdata, company, tscore){
+
+			let cols = [];
+			cols.push(company.issueCode);
+			cols.push('<a target="_blank" href="https://finance.naver.com/item/fchart.nhn?code='+company.issueCode+'">'+company.issueName + '</a>');
+			cols.push(company.marketType);
+			cols.push(cdata.closePrice);
+			cols.push(cdata.upperLine);
+			cols.push(cdata.centerLine);
+			cols.push(cdata.lowerLine);
+			cols.push(tscore);
+			cols.push(cdata.obv);
+			cols.push(cdata.obvSignal);
+			cols.push(cdata.ndi);
+			cols.push(cdata.mdm);
+			cols.push(cdata.tr);
 			
-			let newRanking = document.getElementById("IssueTemplate").cloneNode(true);
-			newRanking.id = company.issueCode;
-			newRanking.firstChild.value = tscore;
-			newRanking.href = "https://finance.naver.com/item/fchart.nhn?code="+company.issueCode;
-			newRanking.target = "_Blank";
+			resultE.row.add(cols);
 			
-			let issueName = newRanking.getElementsByTagName("h6");
-			let desc = newRanking.getElementsByTagName("p");
-		  	let score = newRanking.getElementsByTagName("small");
-		  	
-		  	issueName[0].innerText = company.issueName;
-		  	desc[0].innerText ='점수:' + tscore.toFixed(2) + ', E상한선:' +cdata.upperLine 
-		  		+ ',E중심선:' +cdata.centerLine+ ',E하한선:' +cdata.lowerLine+ ', 종가:' +cdata.closePrice
-		  		+ ',OBV:' +cdata.obv+ ',MDM:' +cdata.mdm+ ', TR:' +cdata.tr ; 
-		  	score[0].innerText = i + 1;
-		  
-		  	resultE.insertBefore(newRanking, list[i]);
-		  	
-		  	for( i++ ; i< list.length; i++ ){
-				let nscore = list[i].getElementsByTagName("small");
-				nscore[0].innerText = i;
-			}
-			
-			for(j=rankingMax+1; j<list.length; j++){
-				resultE.removeChild(list[j]);
+    		let index = i,
+        		rowCount = resultE.data().length-1,
+        		insertedRow = resultE.row(rowCount).data(),
+        		tempRow;
+
+		    for (let j=rowCount;j>index;j--) {
+		        tempRow = resultE.row(j-1).data();
+		        resultE.row(j).data(tempRow);
+		        resultE.row(j-1).data(insertedRow);
+		    }     
+    		resultE.draw();
+    		
+    		for (let j=rowCount;j>=rankingMax;j--) {
+				resultE.row(j).remove().draw();
 			}
 		}
 		
@@ -228,7 +273,7 @@
                         </ol>
                         <div class="row inputPanel">
                             <form class="needs-validation" novalidate>
-					          <div class="row g-3" >
+					        <div class="row g-3 " >
 					            <div class="col-sm-6" style="max-width: 160px;">
 					              <label for="EnvelopeDuration" class="form-label">Envelope 기간(일)</label>
 					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="EnvelopeDuration" placeholder="" value="20" required>
@@ -244,41 +289,138 @@
 					                Valid last Envelope 가감값 is required.
 					              </div>
 					            </div> 
+					        </div>
+					        <div class="row g-3 " >
+					            <div class="col-sm-6" style="max-width: 200px;">
+					              <label for="ObvShortTerm" class="form-label">OBV Signal Short Term</label>
+					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="ObvShortTerm" placeholder="" value="10" required>
+					              <div class="invalid-feedback">
+					                Valid Envelope OBV Signal Short Term is required.
+					              </div>
+					            </div>
 					
+					            <div class="col-sm-6" style="max-width: 200px;">
+					              <label for="ObvLongTerm" class="form-label">OBV Signal Long Term</label>
+					              <input style="text-align: right;" type="number" min="1" max="100"  class="form-control" id="ObvLongTerm" placeholder="" value="30" required>
+					              <div class="invalid-feedback">
+					                Valid last Envelope OBV Signal Long Term is required.
+					              </div>
+					            </div> 
+					        </div>
+							<div class="row g-3 mt-2" >
 					            <div class="col-12">
-					              <div class="form-check">
-									  <input id="ALL" name="marketType" type="radio" class="form-check-input" checked required>
-						              <label class="form-check-label" for="ALL">전체</label>
-						              </div><div class="form-check">
-						              <input id="KOSPI" name="marketType" type="radio" class="form-check-input" required>
+									<div>
+									<label for="EnvelopeDuration" class="form-label">시장 구분 </label>
+									</div>
+					              	  <div class="form-check" style="display:inline-block;;margin-right:20px">
+						              <input id="KOSPI" name="marketType" type="radio" class="form-check-input" checked required>
 						              <label class="form-check-label" for="KOSPI">코스피</label>
-										</div><div class="form-check">
+									  </div><div class="form-check" style="display:inline-block;;margin-right:20px">
 						              <input id="KOSDAQ" name="marketType" type="radio" class="form-check-input" required>
 						              <label class="form-check-label" for="KOSDAQ">코스닥</label>
-						              </div><div class="form-check">
+						              </div><div class="form-check" style="display:inline-block;;margin-right:20px">
 						              <input id="KONEX" name="marketType" type="radio" class="form-check-input" required>
 						              <label class="form-check-label" for="KONEX">코넥스</label>
-					            </div>
-
-					          <button id="startButton" class="w-100 btn btn-primary btn-lg" type="button" onclick="startAnalyze()">차트 분석 시작 !!</button>
+					            	  </div>
+					            	  <div class="form-check " style="display:inline-block;margin-right:20px" > 
+									  <input id="ALL" name="marketType" type="radio" class="form-check-input" required>
+						              <label class="form-check-label" for="ALL">전체</label>
+						              </div>
+								</div>
+								
+								<div class="row g-3 " >
+					
+					            <div class="col-sm-6" style="max-width: 200px;">
+									<div  style="display:inline-block;margin-right:20px">
+					              	<label class="form-label">결과 수량</label>
+					              	</div><div style="display:inline-block;margin-right:20px">
+					              	<select id="resultCount" class="form-select">
+										  <option value=10 selected>10</option>
+										  <option value=20>20</option>
+										  <option value=50>50</option>
+										  <option value=100>100</option>
+										  <option value="">all</option>
+									 </select>
+									 </div>
+					            </div> 
+					            
+					            <div class="col-sm-6" style="max-width: 300px;">
+									<div style="display:inline-block;margin-right:20px">
+					              	<label class="form-label">주가 최소치</label>
+					              	</div>
+					              	<div style="display:inline-block;margin-right:20px">
+					              	<input style="text-align: right;max-width:100px" type="number" min="0"   class="form-control" id="minEndCost" placeholder="" value=1000 required>
+					            	</div>
+					            </div> 
+					        </div>
+							</div>
+							<div class="row g-3 mt-2" >
+					          	<button id="startButton" class="w-100 btn btn-primary btn-lg" type="button" onclick="startAnalyze()">차트 분석 시작 !!</button>
+					        </div>
 					        </form>
                         </div>
                         <div class="row">
                         	<label id="runState" class="form-label"></label>
                         </div>
-                        <hr class="my-4">
 						<div class="row">
-							<label for="EnvelopeDuration" class="form-label">Envelope 하한선 접근</label>
-							<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
-							  <div id="resultELower" class="list-group"/>
-							</div>
+							<div class="card mb-4">
+	                            <div class="card-header">
+	                                <i class="fas fa-table me-1"></i>
+	                                Envelope 하한선 접근
+	                            </div>
+								<div class="card-body">
+									<table id="resultLowerTable"  class="display" style="width:100%">
+	                                    <thead>
+	                                        <tr>
+	                                            <th>단축코드</th>
+	                                            <th>종목명</th>
+	                                            <th>시장구분</th>
+	                                            <th>종가</th>
+	                                            <th>상한선</th>
+	                                            <th>중심선</th>
+	                                            <th>하한선</th>
+	                                            <th>접근값</th>
+	                                            <th>OBV</th>
+	                                            <th>OBV Signal</th>
+	                                            <th>NDI</th>
+	                                            <th>MDM</th>
+	                                            <th>TR</th>
+	                                        </tr>
+	                                    </thead>
+	                                </table>
+	                             </div>
+	                          </div>
 						</div>
-						<hr class="my-4">
+
 						<div class="row">
-							<label for="EnvelopeDuration" class="form-label">Envelope 상한선 접근</label>
-							<div class="d-flex flex-column flex-md-row p-4 gap-4 py-md-5 align-items-center justify-content-center">
-							  <div id="resultEUpper" class="list-group"/>
-							</div>
+							<div class="card mb-4">
+	                            <div class="card-header">
+	                                <i class="fas fa-table me-1"></i>
+	                                Envelope 상한선 접근
+	                            </div>
+								<div class="card-body">
+									
+									<table id="resultUpperTable"  class="display" style="width:100%">
+	                                    <thead>
+	                                        <tr>
+	                                            <th>단축코드</th>
+	                                            <th>종목명</th>
+	                                            <th>시장구분</th>
+	                                            <th>종가</th>
+	                                            <th>상한선</th>
+	                                            <th>중심선</th>
+	                                            <th>하한선</th>
+	                                            <th>접근값</th>
+	                                            <th>OBV</th>
+	                                            <th>OBV Signal</th>
+	                                            <th>NDI</th>
+	                                            <th>MDM</th>
+	                                            <th>TR</th>
+	                                        </tr>
+	                                    </thead>
+	                                </table>
+	                              </div>
+                             </div>
 						</div>
                     </div>
                 </main>

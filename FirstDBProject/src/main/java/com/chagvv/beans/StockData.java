@@ -22,6 +22,7 @@ public class StockData {
 	long ndi;
 	double mdm;
 	double tr;
+	int obvSignal;
 	
 	//점수
 	int score;
@@ -142,6 +143,22 @@ public class StockData {
 
 	public void setTr(double tr) {
 		this.tr = tr;
+	}
+
+	public int getObvSignal() {
+		return obvSignal;
+	}
+
+	public void setObvSignal(int obvSignal) {
+		this.obvSignal = obvSignal;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
 	}
 	
 	

@@ -55,9 +55,10 @@ public class StockController {
 	
 	@GetMapping("/analyzeCompany")
 	@ResponseBody 
-	public List<StockData> analyzeCompany(@RequestParam String issueCode,@RequestParam Integer EnvelopeDuration,@RequestParam Integer EnvelopeRate) { 
+	public List<StockData> analyzeCompany(@RequestParam String issueCode,@RequestParam Integer EnvelopeDuration,
+			@RequestParam Integer EnvelopeRate,@RequestParam Integer ObvShortTerm,@RequestParam Integer ObvLongTerm) { 
 		
-		DataGatheringManager manager = new DataGatheringManager(EnvelopeDuration,EnvelopeRate);
+		DataGatheringManager manager = new DataGatheringManager(EnvelopeDuration,EnvelopeRate,ObvShortTerm,ObvLongTerm);
 		List<StockData> result = null;
 		try {
 			result = manager.getStockData(issueCode);

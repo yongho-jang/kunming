@@ -28,19 +28,26 @@ public class DataGatheringManager {
 	String endDayStr;
 	int envelopeDuration;  //env 중심선 계산 평균값을 찾기 위한 기간 
 	int envelopeRate; 	//end 상,하한선을 계산 하기 위한 비율 
+	int obvShortTerm;
+	int obvLongTerm;
 	
-	public DataGatheringManager(int envelopeDuration, int envelopeRate) {
+	public DataGatheringManager(int envelopeDuration, int envelopeRate, int obvShortTerm, int obvLongTerm) {
 		this.envelopeDuration = envelopeDuration;
 		this.envelopeRate = envelopeRate;
+		this.obvShortTerm = obvShortTerm;
+		this.obvLongTerm = obvLongTerm;
+		
+		int duration = envelopeDuration;
+		if(envelopeDuration < obvLongTerm) {
+			duration = obvLongTerm;
+		}
 		
 		Calendar endDay = Calendar.getInstance();
 		Calendar startDay = Calendar.getInstance();
-		startDay.add(Calendar.DATE, -(envelopeDuration+1));
+		startDay.add(Calendar.DATE, -(duration+1));
 		
 		startDayStr = format.format(startDay.getTime());
 		endDayStr = format.format(endDay.getTime());
-		
-		
 	}
 	
 	/**
@@ -83,7 +90,7 @@ public class DataGatheringManager {
 		
 		searchNdi(list);
 		
-		
+		calculateOBVSignal(list,obvShortTerm,obvLongTerm);
 		
 		return list;
 	}
@@ -151,9 +158,8 @@ public class DataGatheringManager {
 				//TR
 				data.setTr(Math.max(a-b, Math.max(Math.abs(e-a), Math.abs(e-b))));
 					
-			}else {
-				data.setObv(data.getTransactionVolume());
 			}
+			
 			preData = data;
 		}
 			
@@ -181,4 +187,27 @@ public class DataGatheringManager {
 			data.setNdi( (long)Math.round(mdmavg / travg) );
 		}
 	}
+	
+	// OBV Signal을 계산하는 메소드 by AI 
+    public void calculateOBVSignal(List<StockData> stockDataList, int shortTerm, int longTerm) {
+        int obvSignal = 0;
+        int shortTermSum = 0;
+        int longTermSum = 0;
+        for (int i = 0; i < stockDataList.size(); i++) {
+            StockData stockData = stockDataList.get(i);
+            if (i >= shortTerm) {
+                shortTermSum -= stockDataList.get(i - shortTerm).getObv();
+            }
+            if (i >= longTerm) {
+                longTermSum -= stockDataList.get(i - longTerm).getObv();
+            }
+            shortTermSum += stockData.getObv();
+            longTermSum += stockData.getObv();
+            double shortTermMovingAverage = shortTermSum / (double)shortTerm;
+            double longTermMovingAverage = longTermSum / (double)longTerm;
+            obvSignal = (int)(shortTermMovingAverage - longTermMovingAverage);
+            stockData.setObvSignal(obvSignal);
+        }
+    }
+
 }

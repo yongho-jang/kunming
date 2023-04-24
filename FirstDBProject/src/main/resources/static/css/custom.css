@@ -108,3 +108,11 @@
   width: 3rem;
   height: 3rem;
 }
+
+table.dataTable td {
+  font-size: 0.8em;
+}
+
+table.dataTable th {
+  font-size: 0.8em;
+}
