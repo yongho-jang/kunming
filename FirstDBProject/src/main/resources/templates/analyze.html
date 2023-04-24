@@ -122,7 +122,7 @@
 			
 		
 			runAnalyzeList(targetList, 0);
-
+			
 		}
 		
 		function runAnalyzeList(list, i){
@@ -158,6 +158,10 @@
 							isRun = false;
 							button.innerText = startText;
 							runState.innerText = '';
+							
+							console.log('addCompanyData start');
+							addCompanyData('resultLowerTable');
+							addCompanyData('resultUpperTable');
 						}
 					} else {
 						console.error(xhr.statusText);
@@ -237,7 +241,10 @@
 			cols.push(cdata.ndi);
 			cols.push(cdata.mdm);
 			cols.push(cdata.tr);
-			
+			cols.push('');
+			cols.push('');
+			cols.push('');
+			cols.push('');
 			resultE.row.add(cols);
 			
     		let index = i,
@@ -257,6 +264,47 @@
 			}
 		}
 		
+		function addCompanyData(elementId){
+			
+			var resultE = $('#'+elementId).DataTable();
+			let ranking = resultE.rows().data();
+			
+			console.log(ranking);
+			
+			for(var i=0; i< ranking.length ; i++){
+
+				let issueCode = ranking[i][0]; //issueCode
+
+				const xhr = new XMLHttpRequest();
+			
+				xhr.open('GET', '/chagvv/setCompanyAddData?issueCode=' + issueCode);
+				xhr.setRequestHeader("Content-Type", "application/json");
+				xhr.onload = function (e) {
+					if (xhr.readyState === 4) {
+						if (xhr.status === 200) {
+							let result = JSON.parse(xhr.response);
+							
+							console.log(issueCode + ':' + xhr.response);
+							//ranking[i][13] = result.salesCost1;
+							//ranking[i][14] = result.salesCost2;
+							//ranking[i][15] = result.salesCost3;
+							//ranking[i][16] = result.salesCost4;
+							
+							resultE.draw();
+						} else {
+							console.error(xhr.statusText);
+						}
+					}
+				};
+			
+				xhr.onerror = function (e) {
+					console.error(xhr.statusText);
+				};
+
+				/* 정의된 서버에 요청을 전송 */
+				xhr.send();
+			}
+		}
 	</script>
     <body class="sb-nav-fixed">
         <nav  th:replace="~{fragments/header :: title}"/>
@@ -385,6 +433,10 @@
 	                                            <th>NDI</th>
 	                                            <th>MDM</th>
 	                                            <th>TR</th>
+	                                            <th>매출액 2020</th>
+	                                            <th>매출액 2021</th>
+	                                            <th>매출액 2022</th>
+	                                            <th>매출액 2023(E)</th>
 	                                        </tr>
 	                                    </thead>
 	                                </table>
@@ -416,6 +468,10 @@
 	                                            <th>NDI</th>
 	                                            <th>MDM</th>
 	                                            <th>TR</th>
+	                                            <th>매출액 2020</th>
+	                                            <th>매출액 2021</th>
+	                                            <th>매출액 2022</th>
+	                                            <th>매출액 2023(E)</th>
 	                                        </tr>
 	                                    </thead>
 	                                </table>
