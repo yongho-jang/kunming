@@ -3,6 +3,7 @@ package com.chagvv.controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.jsoup.Connection;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.chagvv.beans.StockData;
+import com.chagvv.beans.AnalyzeData;
 import com.chagvv.beans.Company;
+import com.chagvv.service.AnalyzeService;
 import com.chagvv.service.CompanyService;
 import com.chagvv.service.DataGatheringManager;
 
@@ -27,10 +30,13 @@ import jakarta.annotation.PostConstruct;
 public class StockController {
 	
 	CompanyService companyService;
+	AnalyzeService analyzeService;
 	
-	public StockController(CompanyService service) {
+	public StockController(CompanyService service, AnalyzeService analyzeService) {
 
 		this.companyService = service;
+		this.analyzeService = analyzeService;
+		
 		try {
 			companyService.reloadAllCompanies();
 		} catch (IOException e) {
@@ -45,9 +51,7 @@ public class StockController {
 	
 	@GetMapping("/analyze")
 	public String analyze(ModelMap map) { 
-		List<Company> list = companyService.getAllCompanyList();
-		
-		map.addAttribute("companyList", list);
+
 		return "analyze";
 	}
 	
@@ -72,6 +76,22 @@ public class StockController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return result;
+	}
+	
+	@GetMapping("/analyzeAllCompany")
+	@ResponseBody 
+	public Map<String, List<AnalyzeData>> analyzeAllCompany(
+			@RequestParam String marketType,
+			@RequestParam Integer EnvelopeDuration,
+			@RequestParam Integer EnvelopeRate,
+			@RequestParam Integer ObvShortTerm,
+			@RequestParam Integer ObvLongTerm,
+			@RequestParam Integer minEndCost,
+			@RequestParam Integer maxCount) { 
+
+		Map<String, List<AnalyzeData>> result = analyzeService.analyzeAllCompany(marketType, EnvelopeDuration, EnvelopeRate, ObvShortTerm, ObvLongTerm, minEndCost, maxCount);
+		
 		return result;
 	}
 	

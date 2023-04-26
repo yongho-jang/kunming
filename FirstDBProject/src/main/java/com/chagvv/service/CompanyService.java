@@ -8,11 +8,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
 import com.chagvv.beans.Company;
@@ -76,5 +71,16 @@ public class CompanyService {
 		this.allCompanyList = allCompanyList;
 	}
 	
-	
+	public List<Company> searchMarketType(String marketType){
+		
+		List<Company> result = new ArrayList<>();
+		
+		for(Company com: allCompanyList) {
+			if(marketType.equals(com.getMarketType())) {
+				result.add(com);
+			}
+		}
+		
+		return result;
+	}
 }

@@ -25,7 +25,8 @@ public class StockData {
 	int obvSignal;
 	
 	//점수
-	int score;
+	int lowerScore;
+	int upperScore;
 
 	@Override
 	public String toString() {
@@ -153,13 +154,23 @@ public class StockData {
 		this.obvSignal = obvSignal;
 	}
 
-	public int getScore() {
-		return score;
+	public int getLowerScore() {
+		return lowerScore;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
+	public void setLowerScore(int lowerScore) {
+		this.lowerScore = lowerScore;
 	}
+
+	public int getUpperScore() {
+		return upperScore;
+	}
+
+	public void setUpperScore(int upperScore) {
+		this.upperScore = upperScore;
+	}
+
+	
 	
 	
 }

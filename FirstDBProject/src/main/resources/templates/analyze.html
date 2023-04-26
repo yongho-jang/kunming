@@ -51,26 +51,9 @@
 		    var resultLowerTable = $('#resultUpperTable').DataTable(config);
 		    var resultUpperTable = $('#resultLowerTable').DataTable(config);
 		});
-/*
-		window.addEventListener('DOMContentLoaded', event => {
-		    let resultUpperTable = document.getElementById('resultUpperTable');
-		    
-		    if (resultUpperTable) {
-		        new simpleDatatables.DataTable(resultUpperTable);
-		        resultUpperTable.id = 'resultUpperTable';
-		    }
-		    
-		    let  resultLowerTable = document.getElementById('resultLowerTable');
-		    if (resultLowerTable) {
-		        new simpleDatatables.DataTable(resultLowerTable);
-		        resultLowerTable.id = 'resultLowerTable';
-		    }
-		});
-*/
 		
 		var rankingMax = 10;
-		var companyList = [(${companyList})];
-		
+
 		var stopText = "차트 분석 중지 !!";
 		var startText = "차트 분석 시작 !!";
 		function startAnalyze(){
@@ -92,7 +75,6 @@
 		var isRun = false;
 		
 		function runAnalyze(){
-
 			$('#resultLowerTable').DataTable().clear().draw();
 			$('#resultUpperTable').DataTable().clear().draw();
 			
@@ -107,42 +89,18 @@
 					break;
 				}
 			}
-
-			let synchSize = 100;
 			
-			let targetList = companyList;
-			if(marketType != 'ALL'){
-				targetList = [];
-				companyList.forEach(company =>{
-					if(company.marketType == marketType){
-						targetList.push(company);
-					}
-				});
-			}
-			
-		
-			runAnalyzeList(targetList, 0);
-			
-		}
-		
-		function runAnalyzeList(list, i){
-			
-			let EnvelopeDuration = document.getElementById("EnvelopeDuration").value;
-			let EnvelopeRate = document.getElementById("EnvelopeRate").value;
-			let button = document.getElementById("startButton");
-			let runState = document.getElementById("runState");
-			
-			let ObvLongTerm = document.getElementById("ObvLongTerm").value;
-			let ObvShortTerm = document.getElementById("ObvShortTerm").value;
-
-			let company = list[i];
-			let issueCode = company.issueCode;
-			runState.innerText = company.issueName + ' 분석중... ('+i + '/'+ list.length +')';
+			let minEndCost = document.getElementById("minEndCost").value;
 			
 			const xhr = new XMLHttpRequest();
 			
-			xhr.open('GET', '/chagvv/analyzeCompany?issueCode=' + issueCode + "&EnvelopeDuration="
-				+EnvelopeDuration+ "&EnvelopeRate=" + EnvelopeRate+ "&ObvLongTerm=" + ObvLongTerm+ "&ObvShortTerm=" + ObvShortTerm);
+			xhr.open('GET', '/chagvv/analyzeAllCompany?marketType=' + marketType 
+				+ "&EnvelopeDuration="+EnvelopeDuration
+				+ "&EnvelopeRate=" + EnvelopeRate
+				+ "&ObvLongTerm=" + ObvLongTerm
+				+ "&ObvShortTerm=" + ObvShortTerm
+				+ "&minEndCost=" + minEndCost
+				+ "&maxCount=" + rankingMax);
 				
 			xhr.setRequestHeader("Content-Type", "application/json");
 			xhr.onload = function (e) {
@@ -150,25 +108,13 @@
 					if (xhr.status === 200) {
 						let result = JSON.parse(xhr.response);
 						
-						scanComplete(result,company);
-						
-						if(list.length-1 > i && isRun){
-							runAnalyzeList(list, i+1);
-						}else{
-							isRun = false;
-							button.innerText = startText;
-							runState.innerText = '';
-							
-							console.log('addCompanyData start');
-							addCompanyData('resultLowerTable');
-							addCompanyData('resultUpperTable');
-						}
-					} else {
-						console.error(xhr.statusText);
-						isRun = false;
-						button.innerText = startText;
-						runState.innerText = '';
-					}
+						scanAllComplete(result.lowerResult, result.upperResult);
+					} 
+					
+					console.error(xhr.statusText);
+					isRun = false;
+					button.innerText = startText;
+					runState.innerText = '';
 				}
 			};
 			
@@ -182,49 +128,13 @@
 			/* 정의된 서버에 요청을 전송 */
 			xhr.send();
 		}
-
-		function scanComplete(data,company){
-			let cdata = data[data.length-1];
-			
-			let minEndCost = document.getElementById("minEndCost").value;
-			if(cdata.closePrice < minEndCost){
-				return;
-			}
-			
-			cdata.lowerScore = Math.round((cdata.closePrice - cdata.lowerLine)*100/(cdata.centerLine-cdata.lowerLine));
-			cdata.upperScore = Math.round((cdata.upperLine - cdata.closePrice )*100/(cdata.upperLine-cdata.centerLine));
-
-			if(!cdata.lowerScore)cdata.lowerScore = 0;
-			if(!cdata.upperScore)cdata.upperScore = 0;
-			
-			insertTR("resultLowerTable", cdata, company, cdata.lowerScore, true);
-			insertTR("resultUpperTable", cdata, company, cdata.upperScore, true);
+		
+		function scanAllComplete(lowerList, upperList){
+			//TO-DO
+			console.log(lowerList);
+			console.log(upperList);
 		}
-		
-		function insertTR(elementId, cdata, company, tscore, up){
 			
-			var resultE = $('#'+elementId).DataTable();
-			let ranking = resultE.rows().data();
-			let insert = false;
-			
-			if(ranking){
-				for(var i=0; i< ranking.length ; i++){
-
-					let score = ranking[i][7]; //score
-					
-					if(score > tscore){
-						insertTD(resultE, ranking, i , cdata, company, tscore);
-						insert = true;
-						break;
-					}
-				}
-			}
-			if(!insert){
-				insertTD(resultE, ranking, ranking.length , cdata, company, tscore);
-			}
-		}
-		
-		
 		function insertTD(resultE, list, i, cdata, company, tscore){
 
 			let cols = [];
