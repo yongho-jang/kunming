@@ -130,90 +130,43 @@
 		}
 		
 		function scanAllComplete(lowerList, upperList){
-			//TO-DO
-			console.log(lowerList);
-			console.log(upperList);
+			
+			var lowerTable = $('#resultLowerTable').DataTable();
+			var upperTable = $('#resultUpperTable').DataTable();
+			
+			insertList(lowerTable, lowerList);
+			insertList(upperTable, upperList);
 		}
 			
-		function insertTD(resultE, list, i, cdata, company, tscore){
-
-			let cols = [];
-			cols.push(company.issueCode);
-			cols.push('<a target="_blank" href="https://finance.naver.com/item/fchart.nhn?code='+company.issueCode+'">'+company.issueName + '</a>');
-			cols.push(company.marketType);
-			cols.push(cdata.closePrice);
-			cols.push(cdata.upperLine);
-			cols.push(cdata.centerLine);
-			cols.push(cdata.lowerLine);
-			cols.push(tscore);
-			cols.push(cdata.obv);
-			cols.push(cdata.obvSignal);
-			cols.push(cdata.ndi);
-			cols.push(cdata.mdm);
-			cols.push(cdata.tr);
-			cols.push('');
-			cols.push('');
-			cols.push('');
-			cols.push('');
-			resultE.row.add(cols);
+		function insertList(table, list){
 			
-    		let index = i,
-        		rowCount = resultE.data().length-1,
-        		insertedRow = resultE.row(rowCount).data(),
-        		tempRow;
-
-		    for (let j=rowCount;j>index;j--) {
-		        tempRow = resultE.row(j-1).data();
-		        resultE.row(j).data(tempRow);
-		        resultE.row(j-1).data(insertedRow);
-		    }     
-    		resultE.draw();
-    		
-    		for (let j=rowCount;j>=rankingMax;j--) {
-				resultE.row(j).remove().draw();
+			for(let i=0; i< list.length; i++){
+				
+				let company = list[i].company;
+				let cdata = list[i].stock;
+				
+				let cols = [];
+				cols.push(company.issueCode);
+				cols.push('<a target="_blank" href="https://finance.naver.com/item/fchart.nhn?code='+company.issueCode+'">'+company.issueName + '</a>');
+				cols.push(company.marketType);
+				cols.push(cdata.closePrice);
+				cols.push(cdata.upperLine);
+				cols.push(cdata.centerLine);
+				cols.push(cdata.lowerLine);
+				cols.push(list[i].score);
+				cols.push(cdata.obv);
+				cols.push(cdata.obvSignal);
+				cols.push(cdata.ndi);
+				cols.push(cdata.mdm);
+				cols.push(cdata.tr);
+				cols.push(list[i].salesCost1);
+				cols.push(list[i].salesCost2);
+				cols.push(list[i].salesCost3);
+				cols.push(list[i].salesCost4);
+				table.row.add(cols);
 			}
-		}
-		
-		function addCompanyData(elementId){
-			
-			var resultE = $('#'+elementId).DataTable();
-			let ranking = resultE.rows().data();
-			
-			console.log(ranking);
-			
-			for(var i=0; i< ranking.length ; i++){
 
-				let issueCode = ranking[i][0]; //issueCode
-
-				const xhr = new XMLHttpRequest();
-			
-				xhr.open('GET', '/chagvv/setCompanyAddData?issueCode=' + issueCode);
-				xhr.setRequestHeader("Content-Type", "application/json");
-				xhr.onload = function (e) {
-					if (xhr.readyState === 4) {
-						if (xhr.status === 200) {
-							let result = JSON.parse(xhr.response);
-							
-							console.log(issueCode + ':' + xhr.response);
-							//ranking[i][13] = result.salesCost1;
-							//ranking[i][14] = result.salesCost2;
-							//ranking[i][15] = result.salesCost3;
-							//ranking[i][16] = result.salesCost4;
-							
-							resultE.draw();
-						} else {
-							console.error(xhr.statusText);
-						}
-					}
-				};
-			
-				xhr.onerror = function (e) {
-					console.error(xhr.statusText);
-				};
-
-				/* 정의된 서버에 요청을 전송 */
-				xhr.send();
-			}
+    		table.draw();
 		}
 	</script>
     <body class="sb-nav-fixed">

@@ -36,7 +36,7 @@ public class AnalyzeService {
 		Map<String,List<AnalyzeData>> result = new HashMap<>();
 		
 		List<AnalyzeData> lowerResult = new ArrayList<>();
-		List<AnalyzeData> UpperResult = new ArrayList<>();
+		List<AnalyzeData> upperResult = new ArrayList<>();
 		
 		for(Company company: list) {
 			try {
@@ -52,15 +52,23 @@ public class AnalyzeService {
 				cdata.setUpperScore(Math.round((cdata.getUpperLine() - cdata.getClosePrice() )*100/(cdata.getUpperLine()-cdata.getCenterLine())));
 
 				insertTr(lowerResult, cdata, cdata.getLowerScore(), company, maxCount);
-				insertTr(UpperResult, cdata, cdata.getUpperScore(), company, maxCount);
+				insertTr(upperResult, cdata, cdata.getUpperScore(), company, maxCount);
 				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 		
+		for(AnalyzeData adata: lowerResult) {
+			companyService.setCompanyAddData(adata);
+		}
+		
+		for(AnalyzeData adata: upperResult) {
+			companyService.setCompanyAddData(adata);
+		}
+		
 		result.put(LOWER_RESULT, lowerResult);
-		result.put(UPPER_RESULT, lowerResult);
+		result.put(UPPER_RESULT, upperResult);
 		
 		return result;
 	}
