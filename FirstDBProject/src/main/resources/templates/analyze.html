@@ -40,10 +40,6 @@
 				    {
 				        targets: 11,
 				        render: $.fn.dataTable.render.number(',')
-				    },
-				    {
-				        targets: 12,
-				        render: $.fn.dataTable.render.number(',')
 				    }
 				]
 			};
@@ -52,22 +48,17 @@
 		    var resultUpperTable = $('#resultLowerTable').DataTable(config);
 		});
 		
-		var rankingMax = 10;
+		var rankingMax = 20;
 
-		var stopText = "차트 분석 중지 !!";
+		var stopText = "차트 분석 중 !!";
 		var startText = "차트 분석 시작 !!";
+		
 		function startAnalyze(){
 			let button = document.getElementById("startButton");
 			
 			if(button.innerText == stopText){
-				isRun = false;
-				button.innerText = startText;
-				
-				let runState = document.getElementById("runState");
-				runState.innerText = '';
+				processEnd();
 			}else{
-				button.innerText = stopText;
-				isRun = true;
 				runAnalyze();				
 			}
 		}
@@ -75,6 +66,9 @@
 		var isRun = false;
 		
 		function runAnalyze(){
+
+			processStart();
+			
 			$('#resultLowerTable').DataTable().clear().draw();
 			$('#resultUpperTable').DataTable().clear().draw();
 			
@@ -90,6 +84,11 @@
 				}
 			}
 			
+			let EnvelopeDuration = document.getElementById("EnvelopeDuration").value;
+			
+			let EnvelopeRate = document.getElementById("EnvelopeRate").value;
+			let ObvLongTerm = document.getElementById("ObvLongTerm").value;
+			let ObvShortTerm = document.getElementById("ObvShortTerm").value;
 			let minEndCost = document.getElementById("minEndCost").value;
 			
 			const xhr = new XMLHttpRequest();
@@ -107,26 +106,49 @@
 				if (xhr.readyState === 4) {
 					if (xhr.status === 200) {
 						let result = JSON.parse(xhr.response);
-						
-						scanAllComplete(result.lowerResult, result.upperResult);
+						if(isRun){
+							scanAllComplete(result.lowerResult, result.upperResult);
+						}
 					} 
-					
-					console.error(xhr.statusText);
-					isRun = false;
-					button.innerText = startText;
-					runState.innerText = '';
+					processEnd();
 				}
 			};
 			
 			xhr.onerror = function (e) {
 				console.error(xhr.statusText);
-				isRun = false;
-				button.innerText = startText;
-				runState.innerText = '';
+				processEnd();
 			};
 
 			/* 정의된 서버에 요청을 전송 */
 			xhr.send();
+		}
+		
+		function processStart(){
+			let button = document.getElementById("startButton");
+			let lowerResult = document.getElementById("lowerResult");
+			let upperResult = document.getElementById("upperResult");
+			let processRow = document.getElementById("processRow");
+			button.disabled=true;
+			isRun = true;
+			button.innerText = stopText;
+			runState.innerText = '';
+			lowerResult.style.display = 'none';
+			upperResult.style.display = 'none';
+			processRow.style.display = '';
+		}
+		
+		function processEnd(){
+			let button = document.getElementById("startButton");
+			let lowerResult = document.getElementById("lowerResult");
+			let upperResult = document.getElementById("upperResult");
+			let processRow = document.getElementById("processRow");
+			button.disabled=false;
+			isRun = false;
+			button.innerText = startText;
+			runState.innerText = '';
+			lowerResult.style.display = '';
+			upperResult.style.display = '';
+			processRow.style.display = 'none';
 		}
 		
 		function scanAllComplete(lowerList, upperList){
@@ -154,11 +176,6 @@
 				cols.push(cdata.centerLine);
 				cols.push(cdata.lowerLine);
 				cols.push(list[i].score);
-				cols.push(cdata.obv);
-				cols.push(cdata.obvSignal);
-				cols.push(cdata.ndi);
-				cols.push(cdata.mdm);
-				cols.push(cdata.tr);
 				cols.push(list[i].salesCost1);
 				cols.push(list[i].salesCost2);
 				cols.push(list[i].salesCost3);
@@ -185,7 +202,7 @@
                         <div class="row inputPanel">
                             <form class="needs-validation" novalidate>
 					        <div class="row g-3 " >
-					            <div class="col-sm-6" style="max-width: 160px;">
+					            <div class="col-sm-6" style="max-width: 200px;">
 					              <label for="EnvelopeDuration" class="form-label">Envelope 기간(일)</label>
 					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="EnvelopeDuration" placeholder="" value="20" required>
 					              <div class="invalid-feedback">
@@ -193,7 +210,7 @@
 					              </div>
 					            </div>
 					
-					            <div class="col-sm-6" style="max-width: 160px;">
+					            <div class="col-sm-6" style="max-width: 200px;">
 					              <label for="EnvelopeRate" class="form-label">Envelope 가감값(%)</label>
 					              <input style="text-align: right;" type="number" min="1" max="100"  class="form-control" id="EnvelopeRate" placeholder="" value="20" required>
 					              <div class="invalid-feedback">
@@ -201,7 +218,7 @@
 					              </div>
 					            </div> 
 					        </div>
-					        <div class="row g-3 " >
+					        <div class="row g-3 mt-2" >
 					            <div class="col-sm-6" style="max-width: 200px;">
 					              <label for="ObvShortTerm" class="form-label">OBV Signal Short Term</label>
 					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="ObvShortTerm" placeholder="" value="10" required>
@@ -246,8 +263,8 @@
 					              	<label class="form-label">결과 수량</label>
 					              	</div><div style="display:inline-block;margin-right:20px">
 					              	<select id="resultCount" class="form-select">
-										  <option value=10 selected>10</option>
-										  <option value=20>20</option>
+										  <option value=10 >10</option>
+										  <option value=20 selected>20</option>
 										  <option value=50>50</option>
 										  <option value=100>100</option>
 										  <option value="">all</option>
@@ -260,20 +277,23 @@
 					              	<label class="form-label">주가 최소치</label>
 					              	</div>
 					              	<div style="display:inline-block;margin-right:20px">
-					              	<input style="text-align: right;max-width:100px" type="number" min="0"   class="form-control" id="minEndCost" placeholder="" value=1000 required>
+					              	<input style="text-align: right;max-width:100px" type="number" min="0"   class="form-control" id="minEndCost" placeholder="" value=2000 required>
 					            	</div>
 					            </div> 
 					        </div>
 							</div>
 							<div class="row g-3 mt-2" >
-					          	<button id="startButton" class="w-100 btn btn-primary btn-lg" type="button" onclick="startAnalyze()">차트 분석 시작 !!</button>
+					          	<button id="startButton" style="width:100%" class="btn btn-primary btn-lg" type="button" onclick="startAnalyze()">차트 분석 시작 !!</button>
 					        </div>
 					        </form>
                         </div>
-                        <div class="row">
+                        <div class="row" style="display:none">
                         	<label id="runState" class="form-label"></label>
                         </div>
-						<div class="row">
+                        <div class="row w-100 " id="processRow" style="display:none;">
+                        	<img src="/chagvv/images/process.gif" style="width:300px ;margin: auto;"/>
+                        </div>
+						<div class="row" id="lowerResult"  style="display:none;">
 							<div class="card mb-4">
 	                            <div class="card-header">
 	                                <i class="fas fa-table me-1"></i>
@@ -291,11 +311,6 @@
 	                                            <th>중심선</th>
 	                                            <th>하한선</th>
 	                                            <th>접근값</th>
-	                                            <th>OBV</th>
-	                                            <th>OBV Signal</th>
-	                                            <th>NDI</th>
-	                                            <th>MDM</th>
-	                                            <th>TR</th>
 	                                            <th>매출액 2020</th>
 	                                            <th>매출액 2021</th>
 	                                            <th>매출액 2022</th>
@@ -307,7 +322,7 @@
 	                          </div>
 						</div>
 
-						<div class="row">
+						<div class="row" id="upperResult" style="display:none;">
 							<div class="card mb-4">
 	                            <div class="card-header">
 	                                <i class="fas fa-table me-1"></i>
@@ -326,11 +341,6 @@
 	                                            <th>중심선</th>
 	                                            <th>하한선</th>
 	                                            <th>접근값</th>
-	                                            <th>OBV</th>
-	                                            <th>OBV Signal</th>
-	                                            <th>NDI</th>
-	                                            <th>MDM</th>
-	                                            <th>TR</th>
 	                                            <th>매출액 2020</th>
 	                                            <th>매출액 2021</th>
 	                                            <th>매출액 2022</th>

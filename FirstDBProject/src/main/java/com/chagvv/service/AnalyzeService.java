@@ -42,7 +42,7 @@ public class AnalyzeService {
 			try {
 				List<StockData> stockList = manager.getStockData(company.getIssueCode());
 				
-				StockData cdata = stockList.get(result.size()-1);
+				StockData cdata = stockList.get(stockList.size()-1);
 				
 				if(cdata.getClosePrice() < minEndCost){
 					continue;

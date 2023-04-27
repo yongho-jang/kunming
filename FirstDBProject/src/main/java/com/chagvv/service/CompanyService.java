@@ -113,30 +113,42 @@ public class CompanyService {
                 	
                 	if(el01!=null) {
                 		String number1 = el01.text().replaceAll(",", "");
-                		if(number1.trim().length()>0)
-	                		adata.setSalesCost1(Integer.parseInt(number1));
+                		if(number1.trim().length()>0) {
+                			try {
+                				adata.setSalesCost1(Integer.parseInt(number1));
+                			}catch(NumberFormatException ex) {}
+                		}
                 		
 	                	Element el02 = el01.nextElementSibling();
 	                	
 	                	if(el02!=null) {
 	                		
 	                		String number2 = el02.text().replaceAll(",", "");
-	                		if(number2.trim().length()>0)
-	                			adata.setSalesCost2(Integer.parseInt(number2));
+	                		if(number2.trim().length()>0) {
+	                			try {
+	                				adata.setSalesCost2(Integer.parseInt(number2));
+	                			}catch(NumberFormatException ex) {}
+	                		}
 		                	Element el03 = el02.nextElementSibling();
 		                	
 		                	if(el03!=null) {
 
 			                	String number3 = el03.text().replaceAll(",", "");
-			                	if(number3.trim().length()>0)
-			                		adata.setSalesCost3(Integer.parseInt(number3));
+			                	if(number3.trim().length()>0) {
+			                		try {
+			                			adata.setSalesCost3(Integer.parseInt(number3));
+			                		}catch(NumberFormatException ex) {}
+			                	}
 			                	
 			                	Element el04 = el03.nextElementSibling();
 			                	
 			                	if(el04!=null) {
 			                		String number4 = el04.text().replaceAll(",", "");
-			                		if(number4.trim().length()>0)
-			                			adata.setSalesCost4(Integer.parseInt(number4));
+			                		if(number4.trim().length()>0) {
+			                			try {
+			                				adata.setSalesCost4(Integer.parseInt(number4));
+			                			}catch(NumberFormatException ex) {}
+			                		}
 			                	}
 		                	}
 	                	}
