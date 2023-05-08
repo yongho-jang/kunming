@@ -52,8 +52,11 @@ public class VoteController {
 	@GetMapping("/voteAccount")
 	@ResponseBody 
 	public String voteAccount(@RequestParam String email,@RequestParam String password,
-			@RequestParam String proxy,@RequestParam String keyword,@RequestParam Boolean backgroundCheck) { 
+			@RequestParam String proxy,@RequestParam String keyword,@RequestParam Boolean backgroundCheck) throws InterruptedException { 
 		
+
+		//service.voteAccount(email, password, proxy, keyword, backgroundCheck);
+		Thread.sleep(5000);
 		String result = "{\"result\":\"ok\"}";
 		
 		return result;

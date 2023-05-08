@@ -8,19 +8,24 @@
 	var startText = "투표 시작 !!";
 	
 	var accountList = [(${accountList})];
-		
+	var runNumber = 0;
+	
 	function startVote(){
 		
 		if(isRun){
 			processEnd();
 		}else{
 			processStart();
-			runVoteList(accountList, 0);
+			
+			for(var i=0; i< 3; i++){
+				runVoteList(accountList, runNumber++);	
+			}
 		}
 	}
 	
 	function runVoteList(list, i){
-			
+		
+		console.log('runVoteList ' + i);
 		let keyword = document.getElementById("keyword").value;
 		let backgroundCheck = document.getElementById("backgroundCheck").checked;
 		let runState = document.getElementById("runState");
@@ -43,13 +48,14 @@
 					
 					voteComplete(result,account);
 					
-					if(list.length-1 > i && isRun){
-						runVoteList(list, i+1);
+					if(list.length-1 > runNumber && isRun){
+						runVoteList(list, runNumber++);
 					}else{
 						processEnd();
 					}
 				} else {
 					console.error(xhr.statusText);
+					runState.innerText = account.email + ' 투표 중 오류 발생... ('+ (i+1) + '/'+ list.length +')';
 					processEnd();
 				}
 			}
@@ -64,7 +70,7 @@
 	}
 	
 	function voteComplete(result,account){
-		
+		console.log('voteComplete');
 	}
 	
 	function processStart(){
@@ -81,6 +87,7 @@
 		isRun = false;
 		button.innerText = startText;
 		//runState.innerText = '';
+		runNumber = 0;
 	}
 		
 	</script>

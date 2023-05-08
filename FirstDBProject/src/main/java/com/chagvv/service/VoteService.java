@@ -28,6 +28,9 @@ public class VoteService {
 	
 	private List<VoteAccount> allAccountList = new ArrayList<>(); 
 	
+	int randomMin = 0;
+	int randomMax = 100;
+	
 	public void reloadAllAccounts() throws IOException{
 		
 		allAccountList.clear();
@@ -121,7 +124,24 @@ public class VoteService {
                 .until(ExpectedConditions.visibilityOfElementLocated(By.className("card")));
         System.out.println("1. Logged in to pinemuse!");
         
-        WebElement searchInput = driver.findElement(By.tagName("input"));
+        if(voteCard(driver, keyword)) {
+	        for(int i=0; i< 4; i++) {
+	        	voteCard(driver, getRandomSearch());
+	        }
+        }
+        
+		driver.quit();
+	}
+	
+	private String getRandomSearch() {
+	    int randomInt = (int) ((Math.random() * (randomMax - randomMin)) + randomMin);
+	    return Integer.toString(randomInt);
+	}
+	
+	private boolean voteCard(WebDriver driver , String keyword) throws InterruptedException {
+		
+		boolean result = false;
+		WebElement searchInput = driver.findElement(By.tagName("input"));
         searchInput.sendKeys(keyword);
         WebElement searchdiv = searchInput.findElement(By.xpath(".."));
         WebElement searchButton = searchdiv.findElement(By.xpath("following-sibling::*"));
@@ -155,13 +175,14 @@ public class VoteService {
 	       				if("red heart outline large icon".equals(cc2)) {
 	       					System.out.println("5. 투표 여부 체크");
 	       					buttonDiv.click();
+	       					result = true;
 	       				}
 	       				break;
 	       			 }
-	       		 }
+	       		}
+	       		break;
         	}
         }
-        
-		driver.quit();
+        return result;
 	}
 }
