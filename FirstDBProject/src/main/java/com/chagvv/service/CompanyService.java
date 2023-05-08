@@ -30,7 +30,7 @@ public class CompanyService {
 		
 		allCompanyList.clear();
 		
-		File file = new File("list.csv");
+		File file = new File("CompanyList.csv");
 		
 		BufferedReader reader = null;
 		try {

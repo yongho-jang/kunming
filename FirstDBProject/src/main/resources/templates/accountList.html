@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head th:replace="~{fragments/header :: head}"/>
+    <script src="/chagvv/js/datatables-simple-demo.js"></script>
+    
+    <body class="sb-nav-fixed">
+        <nav  th:replace="~{fragments/header :: title}"/>
+            
+        <div id="layoutSidenav">
+            <div th:replace="~{fragments/header :: leftMenu}"/>
+
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">계정 목록</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item active">전체 계정 목록입니다.</li>
+                        </ol>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Account List
+                            </div>
+                            <div class="card-body">
+                                <table id="datatablesSimple">
+                                    <thead>
+                                        <tr>
+                                            <th>E-Mail</th>
+                                            <th>Password</th>
+                                            <th>Proxy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="account: ${accountList}">
+                                            <td th:text="${account.email}"/>
+                                            <td th:text="${account.password}"/>
+                                            <td th:text="${account.proxy}"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </main>
+                <footer th:replace="~{fragments/footer :: footer}"/>
+            </div>
+        </div>
+
+    </body>
+</html>

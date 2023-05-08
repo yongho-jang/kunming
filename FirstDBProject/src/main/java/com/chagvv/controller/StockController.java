@@ -3,30 +3,23 @@ package com.chagvv.controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.chagvv.beans.StockData;
 import com.chagvv.beans.AnalyzeData;
 import com.chagvv.beans.Company;
+import com.chagvv.beans.StockData;
 import com.chagvv.service.AnalyzeService;
 import com.chagvv.service.CompanyService;
 import com.chagvv.service.DataGatheringManager;
 
-import jakarta.annotation.PostConstruct;
-
 @Controller
+@RequestMapping("stock")
 public class StockController {
 	
 	CompanyService companyService;
@@ -44,11 +37,6 @@ public class StockController {
 		}
 	}
 
-	@GetMapping("/")
-	public String index() {
-		return "index";
-	}
-	
 	@GetMapping("/analyze")
 	public String analyze(ModelMap map) { 
 

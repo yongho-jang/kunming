@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head th:replace="~{fragments/header :: head}"/>
+    <script>
+	
+	var isRun = false;
+	var stopText = "투표 중지 !!";
+	var startText = "투표 시작 !!";
+	
+	var accountList = [(${accountList})];
+		
+	function startVote(){
+		
+		if(isRun){
+			processEnd();
+		}else{
+			processStart();
+			runVoteList(accountList, 0);
+		}
+	}
+	
+	function runVoteList(list, i){
+			
+		let keyword = document.getElementById("keyword").value;
+		let backgroundCheck = document.getElementById("backgroundCheck").checked;
+		let runState = document.getElementById("runState");
+		let account = list[i];
+		let issueCode = account.email;
+		runState.innerText = account.email + ' 투표중... ('+ (i+1) + '/'+ list.length +')';
+			
+		const xhr = new XMLHttpRequest();
+			
+		xhr.open('GET', '/chagvv/vote/voteAccount?email=' + account.email + "&password=" + account.password
+			+"&proxy=" + account.proxy+"&keyword=" + keyword+"&backgroundCheck=" + backgroundCheck);
+				
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.onload = function (e) {
+			if (xhr.readyState === 4) {
+				if (xhr.status === 200) {
+					let result = JSON.parse(xhr.response);
+					
+					runState.innerText = account.email + ' 투표완료... ('+ (i+1) + '/'+ list.length +')';
+					
+					voteComplete(result,account);
+					
+					if(list.length-1 > i && isRun){
+						runVoteList(list, i+1);
+					}else{
+						processEnd();
+					}
+				} else {
+					console.error(xhr.statusText);
+					processEnd();
+				}
+			}
+		};
+			
+		xhr.onerror = function (e) {
+			console.error(xhr.statusText);
+			processEnd();
+		};
+		/* 정의된 서버에 요청을 전송 */
+		xhr.send();
+	}
+	
+	function voteComplete(result,account){
+		
+	}
+	
+	function processStart(){
+		let button = document.getElementById("startButton");
+		let runState = document.getElementById("runState");
+		isRun = true;
+		button.innerText = stopText;
+		runState.innerText = '';
+	}
+		
+	function processEnd(){
+		let button = document.getElementById("startButton");
+		//let runState = document.getElementById("runState");
+		isRun = false;
+		button.innerText = startText;
+		//runState.innerText = '';
+	}
+		
+	</script>
+    <body class="sb-nav-fixed">
+        <nav  th:replace="~{fragments/header :: title}"/>
+            
+        <div id="layoutSidenav">
+            <div th:replace="~{fragments/header :: leftMenu}"/>
+
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">투표 설정</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item active">입력한 조건으로 투표를 합니다.</li>
+                        </ol>
+                        <div class="row inputPanel">
+                            <form class="needs-validation" novalidate>
+					        <div class="row g-3 " >
+					            <div class="col-sm-6" style="max-width: 200px;">
+					              <label for="keyword" class="form-label">검색어</label>
+					              <input style="text-align: right;"  type="text" class="form-control" id="keyword" placeholder="" value="72" required>
+					              <div class="invalid-feedback">
+					                Valid 검색어 is required.
+					              </div>
+					            </div>
+					        </div>
+					        <div class="row g-3 " >
+					            <div class="col-sm-6" style="max-width: 200px;">
+					              <label for="backgroundCheck" class="form-label">자동 브라우저 감추기</label>
+					              <input style="text-align: right;"  type="checkbox"  id="backgroundCheck"  value="true" required>
+					              <div class="invalid-feedback">
+					                Valid 검색어 is required.
+					              </div>
+					            </div>
+					        </div>
+							<div class="row g-3 mt-2" >
+					          	<button id="startButton" style="width:100%" class="btn btn-primary btn-lg" type="button" onclick="startVote()">투표 시작 !!</button>
+					        </div>
+					        </form>
+                        </div>
+                        <div class="row mt-4">
+                        	<label id="runState" class="form-label"></label>
+                        </div>
+                        <div class="row mt-4">
+                        <iframe name="pinemuse" style="width:100%;height:400px" src="https://vote.pinemuse.com/">
+                        </iframe>
+                        <div>
+                    </div>
+                </main>
+                <footer th:replace="~{fragments/footer :: footer}"/>
+            </div>
+        </div>
+    </body>
+</html>
