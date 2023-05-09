@@ -127,7 +127,7 @@ public class VoteService {
         
         System.out.println("submit");
         
-        Duration timeout = Duration.ofSeconds(10); 
+        Duration timeout = Duration.ofSeconds(60); 
         
         // 로그인 완료 후 페이지 확인
         new WebDriverWait(driver, timeout)
