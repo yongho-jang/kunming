@@ -54,9 +54,8 @@ public class VoteController {
 	public String voteAccount(@RequestParam String email,@RequestParam String password,
 			@RequestParam String proxy,@RequestParam String keyword,@RequestParam Boolean backgroundCheck) throws InterruptedException { 
 		
-
-		//service.voteAccount(email, password, proxy, keyword, backgroundCheck);
-		Thread.sleep(5000);
+		
+		service.voteAccount(email, password, proxy, keyword, backgroundCheck);
 		String result = "{\"result\":\"ok\"}";
 		
 		return result;

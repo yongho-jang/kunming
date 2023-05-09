@@ -17,9 +17,9 @@
 		}else{
 			processStart();
 			
-			for(var i=0; i< 3; i++){
+			//for(var i=0; i< 3; i++){
 				runVoteList(accountList, runNumber++);	
-			}
+			//}
 		}
 	}
 	
@@ -45,7 +45,7 @@
 					let result = JSON.parse(xhr.response);
 					
 					runState.innerText = account.email + ' 투표완료... ('+ (i+1) + '/'+ list.length +')';
-					
+					console.log('voteComplete ' + i);
 					voteComplete(result,account);
 					
 					if(list.length-1 > runNumber && isRun){
@@ -67,10 +67,11 @@
 		};
 		/* 정의된 서버에 요청을 전송 */
 		xhr.send();
+		console.log('runVoteList send ' + i);
 	}
 	
 	function voteComplete(result,account){
-		console.log('voteComplete');
+		
 	}
 	
 	function processStart(){

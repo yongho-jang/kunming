@@ -28,7 +28,7 @@ public class VoteService {
 	
 	private List<VoteAccount> allAccountList = new ArrayList<>(); 
 	
-	int randomMin = 0;
+	int randomMin = 1;
 	int randomMax = 100;
 	
 	public void reloadAllAccounts() throws IOException{
@@ -79,6 +79,7 @@ public class VoteService {
 
 	public void voteAccount(String email,String password, String proxy,String keyword,Boolean backgroundCheck) throws InterruptedException {
 		
+		System.out.println("voteAccount !!");
 		
 		WebDriverManager.chromedriver().setup();
     	//System.setProperty("webdriver.chrome.driver","D:\\geckodriver.exe");
@@ -142,12 +143,13 @@ public class VoteService {
 		
 		boolean result = false;
 		WebElement searchInput = driver.findElement(By.tagName("input"));
+		searchInput.clear();
         searchInput.sendKeys(keyword);
         WebElement searchdiv = searchInput.findElement(By.xpath(".."));
         WebElement searchButton = searchdiv.findElement(By.xpath("following-sibling::*"));
         searchButton.click();
         
-        System.out.println("2. search OK");
+        System.out.println("2. search OK :" + keyword);
         
         Thread.sleep(3000);
         
