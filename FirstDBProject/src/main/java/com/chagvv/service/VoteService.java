@@ -17,11 +17,11 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.chagvv.beans.VoteAccount;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.netty.util.internal.StringUtil;
 
 @Component
 public class VoteService {
@@ -85,26 +85,35 @@ public class VoteService {
     	//System.setProperty("webdriver.chrome.driver","D:\\geckodriver.exe");
     	
 		ChromeOptions options = new ChromeOptions();
+		
 		if(backgroundCheck) {
-			options.addArguments("headless");
+			options.addArguments("--headless");
+			options.addArguments("--start-maximized");
 		}
-		//options.addArguments("--start-maximized");
+		options.addArguments("--window-size=800,600");
+		options.addArguments("disable-gpu");
 		options.addArguments("--remote-allow-origins=*");
-	    options.addArguments("--no-sandbox");
-	    options.addArguments("--disable-dev-shm-usage");
+		options.addArguments("--no-sandbox");
+		options.addArguments("--disable-dev-shm-usage");
 		options.setCapability("ignoreProtectedModeSettings", true);
+			
+//		options.addArguments("--disable-web-security");
+//		options.addArguments("--allow-running-insecure-conten t");
+//		options.addArguments("--disable-cookie-encryption");
+//		options.addArguments("--blink-settings=imagesEnabled=false");
+
 		
-		//options.addArguments("--user-data-dir=/path/to/user/data");
-		
-		options.addArguments("--disable-web-security");
-		options.addArguments("--allow-running-insecure-conten t");
-		options.addArguments("--disable-cookie-encryption");
-		options.addArguments("--blink-settings=imagesEnabled=false");
-		//options.addArguments("--disable-extensions-except=/path/to/extension");
-		
+		if(!StringUtil.isNullOrEmpty(proxy)) {
+			//options.addArguments("--proxy-server="+ proxy);
+			
+			//Proxy proxyObj = new Proxy();
+			//proxyObj.setHttpProxy(proxy);
+			//options.setProxy(proxyObj);
+		}
+
 		//options.setExperimentalOption("prefs", "{'download.default_directory': '/path/to/download/directory'}");
 		WebDriver driver = new ChromeDriver(options);
-		
+	
 		driver.get("https://vote.pinemuse.com/ko/auth/login");
 
         // 이메일 입력

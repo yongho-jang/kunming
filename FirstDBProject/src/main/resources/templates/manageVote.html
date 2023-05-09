@@ -17,9 +17,9 @@
 		}else{
 			processStart();
 			
-			//for(var i=0; i< 3; i++){
+			for(var i=0; i< 2; i++){
 				runVoteList(accountList, runNumber++);	
-			//}
+			}
 		}
 	}
 	
@@ -48,7 +48,7 @@
 					console.log('voteComplete ' + i);
 					voteComplete(result,account);
 					
-					if(list.length-1 > runNumber && isRun){
+					if(list.length > runNumber && isRun){
 						runVoteList(list, runNumber++);
 					}else{
 						processEnd();
@@ -134,7 +134,7 @@
                         	<label id="runState" class="form-label"></label>
                         </div>
                         <div class="row mt-4">
-                        <iframe name="pinemuse" style="width:100%;height:400px" src="https://vote.pinemuse.com/">
+                        <iframe id="pinemuse" name="pinemuse" style="width:100%;height:400px" src="https://vote.pinemuse.com/">
                         </iframe>
                         <div>
                     </div>
