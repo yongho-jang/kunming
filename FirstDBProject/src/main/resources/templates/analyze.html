@@ -93,7 +93,7 @@
 			
 			const xhr = new XMLHttpRequest();
 			
-			xhr.open('GET', '/chagvv/analyzeAllCompany?marketType=' + marketType 
+			xhr.open('GET', '/chagvv/stock/analyzeAllCompany?marketType=' + marketType 
 				+ "&EnvelopeDuration="+EnvelopeDuration
 				+ "&EnvelopeRate=" + EnvelopeRate
 				+ "&ObvLongTerm=" + ObvLongTerm
@@ -202,7 +202,7 @@
                         <div class="row inputPanel">
                             <form class="needs-validation" novalidate>
 					        <div class="row g-3 " >
-					            <div class="col-sm-6" style="max-width: 200px;">
+					            <div class="col-sm-6" style="max-width: 170px;">
 					              <label for="EnvelopeDuration" class="form-label">Envelope 기간(일)</label>
 					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="EnvelopeDuration" placeholder="" value="20" required>
 					              <div class="invalid-feedback">
@@ -210,7 +210,7 @@
 					              </div>
 					            </div>
 					
-					            <div class="col-sm-6" style="max-width: 200px;">
+					            <div class="col-sm-6" style="max-width: 170px;">
 					              <label for="EnvelopeRate" class="form-label">Envelope 가감값(%)</label>
 					              <input style="text-align: right;" type="number" min="1" max="100"  class="form-control" id="EnvelopeRate" placeholder="" value="20" required>
 					              <div class="invalid-feedback">
@@ -218,7 +218,7 @@
 					              </div>
 					            </div> 
 					        </div>
-					        <div class="row g-3 mt-2" >
+					        <div class="row g-3 mt-2" style="display:none">
 					            <div class="col-sm-6" style="max-width: 200px;">
 					              <label for="ObvShortTerm" class="form-label">OBV Signal Short Term</label>
 					              <input style="text-align: right;"  type="number" min="1" max="50" class="form-control" id="ObvShortTerm" placeholder="" value="10" required>
@@ -285,15 +285,16 @@
 							<div class="row g-3 mt-2" >
 					          	<button id="startButton" style="width:100%" class="btn btn-primary btn-lg" type="button" onclick="startAnalyze()">차트 분석 시작 !!</button>
 					        </div>
+					        <div class="row g-3 mt-2" id="processRow" style="display:none;">
+	                        	<img src="/chagvv/images/process.gif" style="width:300px ;margin: auto;"/>
+	                        </div>
 					        </form>
                         </div>
                         <div class="row" style="display:none">
                         	<label id="runState" class="form-label"></label>
                         </div>
-                        <div class="row w-100 " id="processRow" style="display:none;">
-                        	<img src="/chagvv/images/process.gif" style="width:300px ;margin: auto;"/>
-                        </div>
-						<div class="row" id="lowerResult"  style="display:none;">
+                        
+						<div class="row mt-4" id="lowerResult"  style="display:none;">
 							<div class="card mb-4">
 	                            <div class="card-header">
 	                                <i class="fas fa-table me-1"></i>
