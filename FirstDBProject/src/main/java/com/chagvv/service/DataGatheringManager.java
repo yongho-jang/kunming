@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.swing.text.Element;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import com.chagvv.beans.StockData;
 
 public class DataGatheringManager {
@@ -19,7 +25,9 @@ public class DataGatheringManager {
 	public static final String CONTENT_TYPE_NAME = "Content-type";
 	public static final String CONTENT_TYPE_VALUE = "application/json";
 	public static final String CHARSET = "UTF-8";
-	public static final String NAVER_SISE_URL = "https://api.finance.naver.com/siseJson.naver?symbol=%s&requestType=1&startTime=%s&endTime=%s&timeframe=day";
+	//public static final String NAVER_SISE_URL = "https://api.finance.naver.com/siseJson.naver?symbol=%s&requestType=1&startTime=%s&endTime=%s&timeframe=day";
+	public static final String NAVER_SISE_URL = "https://finance.naver.com/item/sise_day.naver?code=%s&page=1";
+	
 	public static final String LINE_START = "[\"";
 	public static final String COMMA = ",";
 	
@@ -57,6 +65,48 @@ public class DataGatheringManager {
 	 */
 	public List<StockData> getStockData(String stockNumber) throws IOException{
 		
+		System.out.println("getStockData");
+		
+		List<StockData> list = new ArrayList<>();
+		
+		try {
+		
+		String domain = String.format(NAVER_SISE_URL,stockNumber);
+
+		URL u = new URL(domain); // (1)
+		HttpURLConnection con = (HttpURLConnection) u.openConnection(); // (2)
+		con.setRequestMethod(METHOD);
+		con.setDoOutput(true);
+		con.setRequestProperty(CONTENT_TYPE_NAME, "text/html;charset=EUC-KR");
+
+		int responseCode = con.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            // 데이터 읽기
+            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String line;
+            StringBuilder response = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+            
+            Document doc = Jsoup.parse(response.toString());
+            Elements tables = doc.getElementsByTag("table");
+            Element table01 = (Element) tables.get(0);
+
+        } else {
+            System.out.println("HTTP request failed. Response Code: " + responseCode);
+        }
+		
+
+		}catch (IOException e) {
+            e.printStackTrace();
+        }
+		return list;
+	}
+	
+	public List<StockData> getStockData_20230627(String stockNumber) throws IOException{
+		
 		List<StockData> list = new ArrayList<>();
 		
 		String domain = String.format(NAVER_SISE_URL,stockNumber, startDayStr, endDayStr);
@@ -66,6 +116,10 @@ public class DataGatheringManager {
 		con.setRequestMethod(METHOD);
 		con.setDoOutput(true);
 		con.setRequestProperty(CONTENT_TYPE_NAME, CONTENT_TYPE_VALUE);
+		
+		Object content = con.getContent();
+		
+		
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), CHARSET));
 		while(br.ready()) {
